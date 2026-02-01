@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Community Alerts – Community Guardian</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #A7EBF2, #54ACBF, #266B8C);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(18px);
+      border-radius: 26px;
+      padding: 36px;
+      box-shadow: 0 20px 45px rgba(1,28,64,0.25);
+    }
+
+    h2 { margin: 0; color: #011C40; }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .btn-group { display: flex; gap: 12px; }
+
+    .post-btn, .map-btn {
+      padding: 12px 20px;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .post-btn { background: #023859; }
+    .map-btn { background: #266B8C; }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #54ACBF;
+      background: #A7EBF2;
+      color: #011C40;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.8);
+      border-radius: 26px;
+      padding: 30px;
+      margin-bottom: 26px;
+      box-shadow: 0 25px 55px rgba(1,28,64,0.25);
+    }
+
+    .resolved { background: rgba(167,235,242,0.7); }
+
+    .category {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #A7EBF2;
+      color: #023859;
+      margin-bottom: 10px;
+    }
+
+    h3 { margin-top: 6px; color: #011C40; }
+
+    .meta { font-size: 13px; color: #266B8C; }
+
+    .status { font-weight: 600; margin-top: 10px; }
+
+    .Verified { color: #16a34a; }
+    .Pending { color: #ca8a04; }
+    .Suspicious { color: #dc2626; }
+    .Resolved { color: #0f766e; }
+
+    .vote-bar { margin-top: 14px; }
+
+    .vote-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .up { background: #16a34a; color: white; }
+    .down { background: #dc2626; color: white; }
+
+    .resolve-btn {
+      margin-top: 14px;
+      padding: 10px 16px;
+      background: #023859;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .map-link {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 16px;
+      background: #266B8C;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h2>Community Alerts Feed 🚨</h2>
+    <div class="btn-group">
+      <button class="post-btn" onclick="goToPostAlert()">➕ Post New Alert</button>
+      <button class="map-btn" onclick="goToMap()">🗺️ View Alert Map</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <select id="statusFilter">
+      <option value="All">All Status</option>
+      <option value="Verified">Verified</option>
+      <option value="Pending">Pending</option>
+      <option value="Suspicious">Suspicious</option>
+      <option value="Resolved">Resolved</option>
+    </select>
+
+    <select id="categoryFilter">
+      <option value="All">All Categories</option>
+      <option value="Accident">Accident</option>
+      <option value="Flood">Flood</option>
+      <option value="Power Cut">Power Cut</option>
+      <option value="Road Block">Road Block</option>
+      <option value="Fire">Fire</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <select id="severityFilter">
+      <option value="All">All Severity</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+  </div>
+
+  <div id="alerts"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import {
+    getFirestore, collection, onSnapshot, query, orderBy,
+    doc, getDoc, updateDoc, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwxYVm-0pnBmhIV2NVeqHuW1n4aizY0pk",
+    authDomain: "community-guardian-94f90.firebaseapp.com",
+    projectId: "community-guardian-94f90"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let allAlerts = [];
+  let currentUser = null;
+
+  onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "login.html";
+    currentUser = user;
+  });
+
+  const q = query(collection(db, "alerts"), orderBy("timestamp", "desc"));
+
+  onSnapshot(q, snap => {
+    allAlerts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAlerts();
+  });
+
+  statusFilter.onchange = renderAlerts;
+  categoryFilter.onchange = renderAlerts;
+  severityFilter.onchange = renderAlerts;
+
+  function renderAlerts() {
+    alerts.innerHTML = "";
+
+    const s = statusFilter.value;
+    const c = categoryFilter.value;
+    const v = severityFilter.value;
+
+    allAlerts
+      .filter(a =>
+        (s === "All" || a.status === s) &&
+        (c === "All" || a.category === c) &&
+        (v === "All" || a.severity === v)
+      )
+      .forEach(a => {
+        alerts.innerHTML += `
+          <div class="card ${a.status === "Resolved" ? "resolved" : ""}">
+            <div class="category">${a.category}</div>
+            <h3>${a.title}</h3>
+            <div class="meta">📍 ${a.landmark || ""}</div>
+            <div class="status ${a.status}">Status: ${a.status}</div>
+
+            ${a.status !== "Resolved" ? `
+              <div class="vote-bar">
+                <button class="vote-btn up" onclick="vote('${a.id}','up')">👍 ${a.upvotes || 0}</button>
+                <button class="vote-btn down" onclick="vote('${a.id}','down')">👎 ${a.downvotes || 0}</button>
+              </div>
+              <button class="resolve-btn" onclick="resolveAlert('${a.id}')">✅ Mark as Resolved</button>
+            ` : `
+              <button class="resolve-btn" onclick="deleteAlert('${a.id}')">🗑 Delete Alert</button>
+            `}
+
+            <a class="map-link"
+              href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(a.fullAddress)}"
+              target="_blank">🧭 Get Directions</a>
+          </div>
+        `;
+      });
+  }
+
+  async function vote(id, type) {
+    const ref = doc(db, "alerts", id);
+    const snap = await getDoc(ref);
+    const a = snap.data();
+
+    if (a.voters && a.voters[currentUser.email])
+      return alert("You already voted");
+
+    let up = a.upvotes || 0;
+    let down = a.downvotes || 0;
+
+    type === "up" ? up++ : down++;
+
+    let status = up >= 3 ? "Verified" : down >= 3 ? "Suspicious" : "Pending";
+
+    await updateDoc(ref, {
+      upvotes: up,
+      downvotes: down,
+      status,
+      [`voters.${currentUser.email}`]: type
+    });
+  }
+
+  async function resolveAlert(id) {
+    await updateDoc(doc(db, "alerts", id), { status: "Resolved" });
+  }
+
+  async function deleteAlert(id) {
+    if (confirm("Delete this resolved alert?"))
+      await deleteDoc(doc(db, "alerts", id));
+  }
+
+  window.goToPostAlert = () => window.location.href = "post-alert.html";
+  window.goToMap = () => window.location.href = "map.html";
+  window.vote = vote;
+  window.resolveAlert = resolveAlert;
+  window.deleteAlert = deleteAlert;
+</script>
+
+</body>
+</html>

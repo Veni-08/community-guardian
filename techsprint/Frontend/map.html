@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Alert Map – Community Guardian</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #A7EBF2, #54ACBF, #266B8C);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #1f2937;
+    }
+
+    iframe {
+      width: 100%;
+      height: 450px;
+      border: none;
+      border-radius: 12px;
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 13px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 14px;
+    }
+
+    .back-btn:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Live Alert Map 🗺️</h2>
+
+    <!-- MAP (iframe) -->
+    <iframe
+      src="https://www.google.com/maps?q=India&z=5&output=embed">
+    </iframe>
+
+    <div class="note">
+      Map shows affected locations based on community alerts.
+    </div>
+
+    <!-- BACK BUTTON (OUTSIDE MAP) -->
+    <button class="back-btn" onclick="goToAlerts()">
+      ⬅ Back to Alerts
+    </button>
+  </div>
+
+  <script>
+    function goToAlerts() {
+      window.location.href = "alerts.html";
+    }
+  </script>
+
+</body>
+</html>

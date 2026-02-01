@@ -1,0 +1,107 @@
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card layout */
+.container {
+  background: #ffffff;
+  width: 380px;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+/* Inputs */
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1e40af;
+}
+
+/* Message */
+#msg {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #2563eb;
+}
+
+/* Alerts feed */
+.feed-container {
+  max-width: 700px;
+  width: 100%;
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  margin-top: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.status {
+  font-weight: 600;
+}
+
+.verified {
+  color: #16a34a;
+}
+
+.pending {
+  color: #ca8a04;
+}
+
+.suspicious {
+  color: #dc2626;
+}

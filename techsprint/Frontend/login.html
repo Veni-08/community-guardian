@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login – Community Guardian</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+
+      /* ✅ Matching grey gradient */
+      background: linear-gradient(
+        135deg,
+        #A7EBF2,
+        #54ACBF,
+        #26658C,
+        #023859,
+        #011C40
+      );
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-card {
+      width: 380px;
+      padding: 36px;
+
+      /* Glass + clean white */
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 16px;
+
+      box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .login-card h2 {
+      text-align: center;
+      margin-bottom: 6px;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 22px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    .login-card input:focus {
+      outline: none;
+      border-color: #4a5353;
+    }
+
+    .login-card button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+
+      /* Neutral dark grey buttons */
+      background: #011C40;
+      color: white;
+    }
+
+    .login-card button:hover {
+      background: #011C40;
+    }
+
+    #msg {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #011C40;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+    <h2>Community Guardian</h2>
+    <div class="subtitle">Secure community alert platform</div>
+
+    <input id="email" type="email" placeholder="Email address">
+    <input id="password" type="password" placeholder="Password">
+
+    <button id="signupBtn">Create Account</button>
+    <button id="loginBtn">Login</button>
+
+    <p id="msg"></p>
+  </div>
+
+  <!-- Firebase Logic (UNCHANGED) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwxYVm-0pnBmhIV2NVeqHuW1n4aizY0pk",
+      authDomain: "community-guardian-94f90.firebaseapp.com",
+      projectId: "community-guardian-94f90",
+      storageBucket: "community-guardian-94f90.firebasestorage.app",
+      messagingSenderId: "418545468676",
+      appId: "1:418545468676:web:763f1e1140da3235347c51"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    signupBtn.onclick = () => {
+      createUserWithEmailAndPassword(auth, email.value, password.value)
+        .then(() => msg.innerText = "Account created. Please login.")
+        .catch(e => msg.innerText = e.message);
+    };
+
+    loginBtn.onclick = () => {
+      signInWithEmailAndPassword(auth, email.value, password.value)
+        .then(() => window.location.href = "alerts.html")
+        .catch(e => msg.innerText = e.message);
+    };
+  </script>
+
+</body>
+</html>

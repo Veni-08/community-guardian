@@ -1,0 +1,21 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDvmRPXcz7xwW93vGonaYj438dFsktwwGY",
+  authDomain: "alertguard-ai.firebaseapp.com",
+  projectId: "alertguard-ai",
+  storageBucket: "alertguard-ai.firebasestorage.app",
+  messagingSenderId: "657590875886",
+  appId: "1:657590875886:web:4ebd6cfdf813ef0c7525ff",
+  measurementId: "G-PN4WV5X027"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);

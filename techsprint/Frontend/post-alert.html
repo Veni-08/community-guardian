@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Post Alert – Community Guardian</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* BACKGROUND */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #A7EBF2, #54ACBF, #266B8C);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    /* CARD */
+    .card {
+      width: 460px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(18px);
+      border-radius: 22px;
+      padding: 34px;
+      box-shadow: 0 18px 45px rgba(1, 28, 64, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    /* BACK BUTTON */
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: #023859;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .back-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* HEADINGS */
+    h2 {
+      text-align: center;
+      margin-bottom: 6px;
+      color: #011C40;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #023859;
+      margin-bottom: 22px;
+    }
+
+    .headline-icon {
+      display: inline-block;
+      vertical-align: middle;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+
+    /* INPUTS */
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid #54ACBF;
+      font-size: 14px;
+      background: #A7EBF2;
+      color: #011C40;
+    }
+
+    textarea {
+      resize: none;
+      height: 70px;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #266B8C;
+    }
+
+    /* POST BUTTON */
+    .post-btn {
+      width: 100%;
+      padding: 13px;
+      background: #023859;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .post-btn:hover {
+      background: #011C40;
+    }
+
+    #msg {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #023859;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <!-- BACK BUTTON -->
+    <button class="back-btn" onclick="goBack()">← Back to Alerts</button>
+
+    <!-- HEADING -->
+    <h2>
+      <span class="headline-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#023859">
+          <path d="M12 2a9 9 0 100 18 9 9 0 000-18zm.75 5a1 1 0 11-2 0 1 1 0 012 0zM11 9h2v6h-2V9z"/>
+        </svg>
+      </span>
+      Post Community Alert
+    </h2>
+
+    <div class="subtitle">Report only if not already mentioned</div>
+
+    <!-- CATEGORY -->
+    <select id="category">
+      <option value="">Select Alert Category</option>
+      <option value="Accident">Accident</option>
+      <option value="Flood">Flood</option>
+      <option value="Fire">Fire</option>
+      <option value="Power Cut">Power Cut</option>
+      <option value="Road Block">Road Block</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <!-- CUSTOM TITLE -->
+    <input id="customTitle" placeholder="Enter alert title" style="display:none">
+
+    <!-- LANDMARK -->
+    <input id="landmark" placeholder="Landmark / Area (e.g. Near Bus Stand)">
+
+    <!-- ADDRESS -->
+    <textarea id="fullAddress" placeholder="Full address for map navigation"></textarea>
+
+    <!-- SEVERITY -->
+    <select id="severity">
+      <option value="High">High Severity</option>
+      <option value="Medium">Medium Severity</option>
+      <option value="Low">Low Severity</option>
+    </select>
+
+    <!-- POST BUTTON -->
+    <button class="post-btn" id="postBtn">Post Alert</button>
+
+    <p id="msg"></p>
+  </div>
+
+  <!-- FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwxYVm-0pnBmhIV2NVeqHuW1n4aizY0pk",
+      authDomain: "community-guardian-94f90.firebaseapp.com",
+      projectId: "community-guardian-94f90"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let user;
+
+    onAuthStateChanged(auth, u => {
+      if (!u) {
+        window.location.href = "login.html";
+      }
+      user = u;
+    });
+
+    // SHOW CUSTOM TITLE ONLY FOR "OTHER"
+    category.onchange = () => {
+      customTitle.style.display =
+        category.value === "Other" ? "block" : "none";
+    };
+
+    // POST ALERT
+    postBtn.onclick = async () => {
+      const cat = category.value;
+      const title = cat === "Other" ? customTitle.value.trim() : cat;
+      const landmarkVal = landmark.value.trim();
+      const addressVal = fullAddress.value.trim();
+
+      if (!cat || !title || !landmarkVal || !addressVal) {
+        msg.innerText = "Please fill all required fields";
+        return;
+      }
+
+      await addDoc(collection(db, "alerts"), {
+        category: cat,
+        title: title,
+        landmark: landmarkVal,
+        fullAddress: addressVal,
+        severity: severity.value,
+        postedBy: user.email,
+        status: "Pending",
+        upvotes: 0,
+        downvotes: 0,
+        voters: {},
+        timestamp: serverTimestamp()
+      });
+
+      msg.innerText = "Alert posted successfully";
+    };
+
+    // BACK NAVIGATION
+    window.goBack = function () {
+  window.location.href = "alerts.html";
+};
+
+  </script>
+
+</body>
+</html>
